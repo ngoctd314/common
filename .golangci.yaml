@@ -1,0 +1,67 @@
+run:
+  # Timeout for analysis, e.g 30s, 5m
+  # Default: 1m
+  timeout: 30m
+  # skip-files:
+  # Include test files or not. Default: true
+  tests: false
+
+output:
+  sort-results: true
+
+linters:
+  # Disable all default linters
+  disable-all: true
+  # Enable specific  linter
+  enable: # please keep this alphabetized
+    - asciicheck # Checks that all code identifiers does not have non-ASCII symbols in the name.
+    - bodyclose # Checks whether HTTP response body is closed successfully.
+    - errcheck # Errcheck is a program for checking for unchecked errors in Go code. These unchecked errors can be critical bugs in some cases.
+    - errorlint # Errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
+    - funlen # Tool for detection of long functions.
+    - forbidigo # Forbids identifiers.
+    - nilerr # Finds the code that returns nil even if it checks that the error is not nil.
+    - misspell # Finds commonly misspelled English words.
+    - lll # Reports long lines.
+    - gocyclo # Computes and checks the cyclomatic complexity of functions.
+    - gofmt # Gofmt checks whether code was gofmt-ed.
+    - govet # Vet examines Go source code and reports suspicious constructs. It is roughly the same as 'go vet' and uses its passes.
+    - gosec # Linter for Go source code that specializes in simplilfying code.
+    - rowserrcheck # Checks whether Rows.Err of rows is checked successfully.
+    - staticcheck
+    - stylecheck
+    - unconvert # Remove unnecessary type conversions.
+
+    # - govet # Vet examines Go source code and reports suspicious constructors. It is roughly the same as 'go vet'.
+    # - ineffassign # Detects when assignments to existing variables are not used.
+    # - staticcheck
+    # - unused # Checks Go code for unused constants, variables, functions and types.
+
+linters-settings: # please keep this alphabetized
+  # Forbid the following identifiers (list of regexp).
+  # Default: ["^(fmt\\.Print(|f|ln)|print|println)$"]
+  forbid:
+    # Builtin function:
+    - ^print.*$
+    # Optional message that gets included in error reports.
+    - p: ^fmt\.Print.*$
+      msg: Do not commit print statements.
+
+  funlen:
+    lines: 120
+  lll:
+    line-length: 120
+  dupl:
+    # Tokens count to trigger issue.
+    # Default: 150
+    threshold: 150
+  gocyclo:
+    # Minimal code complexity to report.
+    # Default: 30 (but we recommend 10-20)
+    min-complexity: 16
+  gosec:
+    excludes:
+      - G112
+
+service:
+  golangci-lint-version: 1.61.0 # use the fixed version to not introduce new linters unexpectedly

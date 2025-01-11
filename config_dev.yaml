@@ -1,0 +1,12 @@
+http:
+  server:
+    addr: 0.0.0.0:8080
+    domain: http://localhost:8080
+    cfg: readHeaderTimeout=500ms&readTimeout=10s&writeTimeout=15s&idleTimeout=10s&maxHeaderBytes=1000
+  client:
+    timeout: 5s
+
+mysql:
+  dev:
+    dsn: user:passwd@tcp(ip:port)/dbName?charset=utf8mb4&loc=Local&parseTime=True
+    cfg: maxOpenConns=100&maxIdleConns=100&connMaxLifetime=5m&connMaxIdleTime=1m
