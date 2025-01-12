@@ -8,3 +8,5 @@ This is a common repository for all the projects. It contains the common code th
 make lint
 make testall
 ```
+
+# Why core is missing
