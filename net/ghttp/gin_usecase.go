@@ -27,6 +27,7 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 
 		defer func() {
 			if err != nil {
+				JSONFail(c, err)
 			}
 		}()
 
@@ -34,17 +35,17 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 		if binder, isBinder := uc.(Binding[Req]); isBinder {
 			bindReq, bindErr := binder.Bind(c)
 			if bindErr != nil {
-				err = apperror.ErrBindRequest(err)
+				err = apperror.ErrBindRequest(bindErr)
 				return
 			}
 			req = *bindReq
 		} else {
 			if bindErr := c.ShouldBind(&req); bindErr != nil {
-				err = apperror.ErrBindRequest(err)
+				err = apperror.ErrBindRequest(bindErr)
 				return
 			}
 			if bindErr := c.ShouldBindUri(&req); bindErr != nil {
-				err = apperror.ErrBindRequest(err)
+				err = apperror.ErrBindRequest(bindErr)
 				return
 			}
 		}

@@ -18,22 +18,12 @@ func JSONSuccess(c *gin.Context, respDTO *ResponseBody) {
 }
 
 func JSONFail(c *gin.Context, err error) {
-	var logErr *apperror.BaseError
-	defer func() {
-		if logErr != nil {
-			logBaseErr(logErr)
-		}
-	}()
-
-	if _, ok := handleHTTPErr(c, err); ok {
-		return
-	}
-	if _, ok := handleBaseErr(c, err); ok {
+	if canHandleErr(c, err) {
 		return
 	}
 
 	httpError := apperror.ErrInternalServer(err)
-	logErr = &httpError.BaseError
+	logBaseErr(&httpError.BaseError)
 
 	c.JSON(httpError.HTTPCode, ResponseBody{
 		Success: false,
@@ -54,23 +44,7 @@ func JSONAbort(c *gin.Context, err error) {
 	JSONFail(c, err)
 }
 
-func handleHTTPErr(c *gin.Context, err error) (*apperror.BaseError, bool) {
-	var httpErr *apperror.HTTPError
-	if errors.As(err, &httpErr) {
-
-		c.JSON(httpErr.HTTPCode, ResponseBody{
-			Success: false,
-			Error:   err,
-			Message: httpErr.Error(),
-		})
-		logBaseErr(&httpErr.BaseError)
-		return &httpErr.BaseError, true
-	}
-
-	return nil, false
-}
-
-func handleBaseErr(c *gin.Context, err error) (*apperror.BaseError, bool) {
+func canHandleErr(c *gin.Context, err error) bool {
 	var baseErr *apperror.BaseError
 	if errors.As(err, &baseErr) {
 		httpErr := apperror.NewHTTPError(err, http.StatusBadRequest)
@@ -80,8 +54,19 @@ func handleBaseErr(c *gin.Context, err error) (*apperror.BaseError, bool) {
 			Message: baseErr.Error(),
 		})
 		logBaseErr(baseErr)
-		return baseErr, true
+		return true
 	}
 
-	return nil, false
+	var httpErr *apperror.HTTPError
+	if errors.As(err, &httpErr) {
+		c.JSON(httpErr.HTTPCode, ResponseBody{
+			Success: false,
+			Error:   err,
+			Message: httpErr.Error(),
+		})
+		logBaseErr(&httpErr.BaseError)
+		return true
+	}
+
+	return false
 }
