@@ -18,7 +18,7 @@ func JSONSuccess(c *gin.Context, respDTO *ResponseBody) {
 }
 
 func JSONFail(c *gin.Context, err error) {
-	if canHandleErr(c, err) {
+	if isInternalErr(c, err) {
 		return
 	}
 
@@ -31,6 +31,11 @@ func JSONFail(c *gin.Context, err error) {
 	})
 }
 
+func JSONAbort(c *gin.Context, err error) {
+	c.Abort()
+	JSONFail(c, err)
+}
+
 func logBaseErr(baseErr *apperror.BaseError) {
 	kvs := []any{"err_id", baseErr.ID}
 	if baseErr.Ancestor() != nil {
@@ -39,12 +44,7 @@ func logBaseErr(baseErr *apperror.BaseError) {
 	slog.Error(baseErr.Error(), kvs...)
 }
 
-func JSONAbort(c *gin.Context, err error) {
-	c.Abort()
-	JSONFail(c, err)
-}
-
-func canHandleErr(c *gin.Context, err error) bool {
+func isInternalErr(c *gin.Context, err error) bool {
 	var baseErr *apperror.BaseError
 	if errors.As(err, &baseErr) {
 		httpErr := apperror.NewHTTPError(err, http.StatusBadRequest)
