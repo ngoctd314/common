@@ -38,3 +38,15 @@ func ResponseBodyCreated(data any, entity string) *ResponseBody {
 		Message:    fmt.Sprintf("%s is created", entity),
 	}
 }
+
+func ResponseBodyWithMessage(message string) func(*ResponseBody) {
+	return func(res *ResponseBody) {
+		res.Message = message
+	}
+}
+
+func ResponseBodyWithStatusCode(statusCode int) func(*ResponseBody) {
+	return func(res *ResponseBody) {
+		res.StatusCode = statusCode
+	}
+}
