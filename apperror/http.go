@@ -15,7 +15,7 @@ type HTTPError struct {
 	// Custom error code
 	//
 	// example: invalid_user
-	ErrCode string `json:"code,omitempty"`
+	ErrType string `json:"type,omitempty"`
 	// HTTP Code
 	//
 	// example: 400
@@ -24,7 +24,7 @@ type HTTPError struct {
 	Validation any `json:"validation,omitempty"`
 
 	// Further error details
-	Details any `json:"details,omitempty"`
+	// Details any `json:"details,omitempty"`
 
 	// Debug information
 	//
@@ -32,7 +32,7 @@ type HTTPError struct {
 	// sensitive information.
 	//
 	// example: SQL field "foo" is not a bool.
-	debug any `json:"-"`
+	// debug any `json:"-"`
 }
 
 func NewHTTPError(err error, httpCode int) *HTTPError {
@@ -51,7 +51,6 @@ func NewHTTPError(err error, httpCode int) *HTTPError {
 	return &HTTPError{
 		BaseError: BaseError{
 			ID:          errID(),
-			message:     err.Error(),
 			ancestorErr: err,
 		},
 		HTTPCode: httpCode,
@@ -63,22 +62,22 @@ func (e *HTTPError) SetRequestID(rid string) *HTTPError {
 	return e
 }
 
-func (e *HTTPError) SetErrCode(errCode string) *HTTPError {
-	e.ErrCode = errCode
+func (e *HTTPError) SetErrType(errCode string) *HTTPError {
+	e.ErrType = errCode
 	return e
 }
 
 // SetDetails override detail information
-func (e *HTTPError) SetDetails(details any) *HTTPError {
-	if details != nil {
-		e.Details = details
-	}
-	return e
-}
+// func (e *HTTPError) SetDetails(details any) *HTTPError {
+// 	if details != nil {
+// 		e.Details = details
+// 	}
+// 	return e
+// }
 
-func (e *HTTPError) SetDebug(debugInfo any) *HTTPError {
-	if debugInfo != nil {
-		e.debug = debugInfo
-	}
-	return e
-}
+// func (e *HTTPError) SetDebug(debugInfo any) *HTTPError {
+// 	if debugInfo != nil {
+// 		e.debug = debugInfo
+// 	}
+// 	return e
+// }

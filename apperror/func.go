@@ -12,20 +12,19 @@ import (
 
 // sentinel error
 var (
-	// ErrDataNotFound is used to make our application logic independent of other libraries errors
 	ErrDataNotFound         error = New("the requested resource could not be found")
 	ErrFilterRequired       error = New("a query filter is required")
 	ErrResourceAlreadyExist error = New("the requested resource already exist")
 )
 
-// ErrBindRequest used when ...
+// ErrBindRequest used when the request was malformed or contained invalid parameters
 func ErrBindRequest(err error) *HTTPError {
 	httpErr := &HTTPError{
 		BaseError: BaseError{
 			ID:      errID(),
 			message: "the request was malformed or contained invalid parameters",
 		},
-		ErrCode:  "invalid_request",
+		ErrType:  "bind_fail",
 		HTTPCode: http.StatusBadRequest,
 	}
 
@@ -58,11 +57,10 @@ func (v ValidatorField) Error() string {
 func ErrValidation(err error) *HTTPError {
 	httpErr := &HTTPError{
 		BaseError: BaseError{
-			ID:          errID(),
-			message:     "the request was malformed or contained invalid parameters",
-			ancestorErr: err,
+			ID:      errID(),
+			message: "the request was malformed or contained invalid parameters",
 		},
-		ErrCode:  "invalid_request",
+		ErrType:  "validate_fail",
 		HTTPCode: http.StatusBadRequest,
 	}
 
@@ -90,7 +88,7 @@ func ErrBadRequest(message string) *HTTPError {
 			ID:      errID(),
 			message: message,
 		},
-		ErrCode:  "bad_request",
+		ErrType:  "bad_request",
 		HTTPCode: http.StatusBadRequest,
 	}
 }
@@ -101,7 +99,7 @@ func ErrNotFound(message string) *HTTPError {
 			ID:      errID(),
 			message: message,
 		},
-		ErrCode:  "not_found",
+		ErrType:  "not_found",
 		HTTPCode: http.StatusNotFound,
 	}
 }
@@ -114,7 +112,7 @@ func ErrUnauthorized(message string) *HTTPError {
 			ID:      errID(),
 			message: message,
 		},
-		ErrCode:  "unauthorized",
+		ErrType:  "unauthorized",
 		HTTPCode: http.StatusUnauthorized,
 	}
 }
@@ -127,7 +125,7 @@ func ErrForbidden(message string) *HTTPError {
 			ID:      errID(),
 			message: message,
 		},
-		ErrCode:  "forbidden",
+		ErrType:  "forbidden",
 		HTTPCode: http.StatusForbidden,
 	}
 }
@@ -135,11 +133,10 @@ func ErrForbidden(message string) *HTTPError {
 func ErrInternalServer(err error) *HTTPError {
 	return &HTTPError{
 		BaseError: BaseError{
-			ID:          errID(),
-			message:     "an internal server error occurred, please contact the system administrator",
-			ancestorErr: err,
+			ID:      errID(),
+			message: "an internal server error occurred, please contact the system administrator",
 		},
-		ErrCode:  "internal_server",
+		ErrType:  "internal_server",
 		HTTPCode: http.StatusInternalServerError,
 	}
 }

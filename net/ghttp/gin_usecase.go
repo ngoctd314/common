@@ -22,11 +22,14 @@ type Validating[Req any] interface {
 
 func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var req Req
-		var err error
+		var (
+			req Req
+			err error
+		)
 
 		defer func() {
 			if err != nil {
+				// set req, rid into context
 				JSONFail(c, err)
 			}
 		}()
@@ -64,7 +67,7 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 			}
 		}
 
-		resp, usecaseErr := uc.Usecase(c, &req)
+		resp, usecaseErr := uc.Usecase(ctx, &req)
 		if usecaseErr != nil {
 			err = usecaseErr
 			return

@@ -2,10 +2,9 @@ package apperror
 
 type BaseError struct {
 	ID string `json:"id"`
-	// example: The resource could not be found
-	// required: true
+	// this message will be shown to the user
 	message string `json:"-"`
-	// ancestor error
+	// this field is used to store the original error, will not be shown to the user
 	ancestorErr error
 }
 
