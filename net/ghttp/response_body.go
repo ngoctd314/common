@@ -1,7 +1,6 @@
 package ghttp
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -30,12 +29,12 @@ func ResponseBodyOK(data any, opts ...func(*ResponseBody)) *ResponseBody {
 	return res
 }
 
-func ResponseBodyCreated(data any, entity string) *ResponseBody {
+func ResponseBodyCreated(data any, message string) *ResponseBody {
 	return &ResponseBody{
 		Data:       data,
 		Success:    true,
 		StatusCode: http.StatusCreated,
-		Message:    fmt.Sprintf("%s is created", entity),
+		Message:    message,
 	}
 }
 

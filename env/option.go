@@ -9,7 +9,7 @@ import (
 
 type option func(*config)
 
-func WithEnvPrefix(envPrefix string) option {
+func withEnvPrefix(envPrefix string) option {
 	return func(c *config) {
 		// if we use envPrefix => make sure it is not empty
 		if strings.TrimSpace(envPrefix) != "" {

@@ -1,4 +1,4 @@
-package apperror
+package apperr
 
 import (
 	"encoding/json"
@@ -8,19 +8,15 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/ngoctd314/common/gvalidator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // sentinel error
 var (
-	// DEPRECATED: use DataNotFound instead
-	ErrDataNotFound error = New("the requested resource could not be found")
-	DataNotFound    error = New("the requested resource could not be found")
-	// DEPRECATED: use FilterRequired instead
-	ErrFilterRequired error = New("a query filter is required")
-	FilterRequired    error = New("a query filter is required")
-	// DEPRECATED: use Conflict instead
-	ErrResourceAlreadyExist error = New("the requested resource already exist")
-	Conflict                error = New("the requested resource already exist")
+	DataNotFound   error = New("the requested resource could not be found")
+	FilterRequired error = New("a query filter is required")
+	Conflict       error = New("the requested resource already exist")
 )
 
 // ErrBindRequest used when the request was malformed or contained invalid parameters
@@ -155,5 +151,23 @@ func ErrInternalServer(err error) *HTTPError {
 		},
 		ErrType:  "internal_server",
 		HTTPCode: http.StatusInternalServerError,
+	}
+}
+
+func ErrGRPC(err error) *HTTPError {
+	errStatus, ok := status.FromError(err)
+	if !ok {
+		return ErrInternalServer(err)
+	}
+
+	switch errStatus.Code() {
+	case codes.InvalidArgument:
+		return ErrBadRequest(errStatus.Message())
+	case codes.NotFound:
+		return ErrNotFound(errStatus.Message())
+	case codes.AlreadyExists:
+		return ErrConflict(errStatus.Message())
+	default:
+		return ErrBadRequest(errStatus.Message())
 	}
 }

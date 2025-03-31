@@ -1,4 +1,4 @@
-package apperror
+package apperr
 
 import (
 	"errors"
@@ -27,12 +27,16 @@ func IsMySQLOutOfRange(err error) bool {
 	return false
 }
 
-func GormTranslator(err error) error {
+// ToMySQLErr convert mysql error to base error
+func ToMySQLErr(err error) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrDataNotFound
+		return DataNotFound
 	}
 	if IsMySQLDuplicate(err) {
 		return Conflict
+	}
+	if IsMySQLOutOfRange(err) {
+		return err
 	}
 
 	return err

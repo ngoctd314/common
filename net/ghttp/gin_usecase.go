@@ -2,6 +2,7 @@ package ghttp
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ngoctd314/common/apperror"
@@ -43,13 +44,16 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 			}
 			req = *bindReq
 		} else {
-			if bindErr := c.ShouldBind(&req); bindErr != nil {
-				err = apperror.ErrBindRequest(bindErr)
-				return
-			}
+			// TODO: check it
 			if bindErr := c.ShouldBindUri(&req); bindErr != nil {
 				err = apperror.ErrBindRequest(bindErr)
 				return
+			}
+			if c.Request.Method != http.MethodDelete {
+				if bindErr := c.ShouldBind(&req); bindErr != nil {
+					err = apperror.ErrBindRequest(bindErr)
+					return
+				}
 			}
 		}
 
@@ -60,11 +64,11 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 				err = apperror.ErrValidation(validateErr)
 				return
 			}
-		} else {
-			if validateErr := gvalidator.ValidateStruct(req); validateErr != nil {
-				err = apperror.ErrValidation(validateErr)
-				return
-			}
+		}
+		// always validate the request
+		if validateErr := gvalidator.ValidateStruct(req); validateErr != nil {
+			err = apperror.ErrValidation(validateErr)
+			return
 		}
 
 		resp, usecaseErr := uc.Usecase(ctx, &req)
@@ -75,4 +79,8 @@ func GinHandleFunc[Req any](uc Usecase[Req]) gin.HandlerFunc {
 
 		JSONSuccess(c, resp)
 	}
+}
+
+type RouteGroup struct {
+	router *gin.RouterGroup
 }

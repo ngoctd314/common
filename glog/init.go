@@ -1,4 +1,4 @@
-package gslog
+package glog
 
 import (
 	"fmt"
