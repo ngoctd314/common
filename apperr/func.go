@@ -167,6 +167,10 @@ func ErrGRPC(err error) *HTTPError {
 		return ErrNotFound(errStatus.Message())
 	case codes.AlreadyExists:
 		return ErrConflict(errStatus.Message())
+	case codes.Unauthenticated:
+		return ErrUnauthorized(errStatus.Message())
+	case codes.PermissionDenied:
+		return ErrForbidden(errStatus.Message())
 	default:
 		return ErrBadRequest(errStatus.Message())
 	}
